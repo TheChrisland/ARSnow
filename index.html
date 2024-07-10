@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const list = ["glasses1", "glasses2", "hat1", "santahat"];
+        const visibles = [true, false, false, false];
+        const setVisible = (button, entities, visible) => {
+          if (visible) {
+            button.classList.add("selected");
+          } else {
+            button.classList.remove("selected");
+          }
+          entities.forEach((entity) => {
+            entity.setAttribute("visible", visible);
+          });
+        }
+        list.forEach((item, index) => {
+          const button = document.querySelector("#" + item);
+          const entities = document.querySelectorAll("." + item + "-entity");
+          setVisible(button, entities, visibles[index]);
+          button.addEventListener('click', () => {
+            visibles[index] = !visibles[index];
+            setVisible(button, entities, visibles[index]);
+          });
+        });
+
+        // Snowfall component
+        AFRAME.registerComponent('snowfall', {
+          init: function () {
+            const snowflakeTextures = [
+              '#snowflake1',
+              '#snowflake2',
+              '#snowflake3',
+              '#snowflake4',
+              '#snowflake5'
+            ];
+            const snowflakesContainer = this.el;
+            const snowflakeCount = 10;  // Number of snowflakes created at each interval
+
+            function createSnowflake() {
+              const snowflake = document.createElement('a-plane');
+              const texture = snowflakeTextures[Math.floor(Math.random() * snowflakeTextures.length)];
+              snowflake.setAttribute('src', texture);
+              snowflake.setAttribute('width', '0.05');  // Half the original width
+              snowflake.setAttribute('height', '0.05');  // Half the original height
+              const x = Math.random() * 4 - 2;  // Spread snowflakes across the screen width
+              const y = Math.random() * 3 + 1;  // Start above the screen
+              const z = Math.random() * 4 - 2;  // Spread snowflakes across the screen depth
+              snowflake.setAttribute('position', `${x} ${y} ${z}`);
+              snowflake.setAttribute('rotation', `${Math.random() * 360} ${Math.random() * 360} ${Math.random() * 360}`);
+              snowflake.setAttribute('material', 'transparent: true; opacity: 0.8');
+              
+              // Falling animation
+              const duration = (Math.random() * 2000 + 3000) * 2;  // Double the duration to fall slower
+              snowflake.setAttribute('animation', `property: position; to: ${x} -2 ${z}; dur: ${duration}; easing: linear; loop: false`);
+              
+              snowflakesContainer.appendChild(snowflake);
+
+              // Remove the snowflake after it has fallen
+              setTimeout(() => {
+                snowflakesContainer.removeChild(snowflake);
+              }, duration);
+            }
+
+            for (let i = 0; i < 50; i++) {
+              createSnowflake();
+            }
+
+            // Create new snowflakes at a regular interval
+            setInterval(() => {
+              for (let i = 0; i < snowflakeCount; i++) {
+                createSnowflake();
+              }
+            }, 500);  // Adjust the interval as needed
+
+            console.log('Scene loaded, starting continuous snowfall');
+          }
+        });
+
+        document.querySelector('a-scene').setAttribute('snowfall', '');
+      });
+    </script>
+    <style>
+      body {
+        margin: 0;
+      }
+      .example-container {
+        overflow: hidden;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+      .options-panel {
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 2;
+      }
+      .options-panel img {
+        border: solid 2px;
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        cursor: pointer;
+      }
+      .options-panel img.selected {
+        border-color: green;
+      }
+    </style>
+</head>
+<body>
+  <div class="example-container">
+    <div class="options-panel">
+      <img id="hat1" src="thumbnails/SantaHat.png"/>
+      <img id="glasses1" src="thumbnails/Glasses.png"/>
+      <img id="glasses2" src="thumbnails/PixelGlasses.png"/>
+      <img id="santahat" src="thumbnails/HotCoco.png"/>
+    </div>
+    <a-scene mindar-face embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      <a-assets>
+        <a-asset-item id="headModel" src="models/headOccluder.glb"></a-asset-item>
+        <a-asset-item id="glassesModel" src="models/snowman.obj"></a-asset-item>
+        <a-asset-item id="glassesModel2" src="models/pixel_glasses.glb"></a-asset-item>
+        <a-asset-item id="hatModel" src="models/christmas_hat.glb"></a-asset-item>
+        <a-asset-item id="hotcoco" src="models/hot_chocolate.glb"></a-asset-item>
+        <img id="snowflake1" src="images/snowflake.png"/>
+        <img id="snowflake2" src="images/snowflake2.png"/>
+        <img id="snowflake3" src="images/snowflake3.png"/>
+        <img id="snowflake4" src="images/snowflake4.png"/>
+        <img id="snowflake5" src="images/snowflake5.png"/>
+      </a-assets>
+      <a-camera active="false" position="0 0 0"></a-camera>
+      <!-- head occluder -->
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-gltf-model mindar-face-occluder position="0 -0.3 0.15" rotation="0 0 0" scale="0.065 0.065 0.065" src="#headModel"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 10">
+        <a-gltf-model rotation="15 65 0" position="-1.5 -6.7 -1.5" scale="8.35 6.4 5.5" src="#hatModel" class="hat1-entity" visible="false"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-obj-model rotation="-90 0 0" position="-0.53 -0.65 .95" scale="0.08 0.075 0.075" src="#glassesModel" class="glasses1-entity" visible="false"></a-obj-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-gltf-model rotation="0 45 0" position="-19.87 -.3 29.35" scale="0.95 0.95 0.95" src="#glassesModel2" class="glasses2-entity" visible="false"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 152">
+        <a-gltf-model rotation="0 0 0" position="0 -0.8 .75" scale="5 5 5" src="#hotcoco" class="santahat-entity" visible="false"></a-gltf-model>
+      </a-entity>
+    </a-scene>
+  </div>
+</body>
+</html>
