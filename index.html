@@ -125,6 +125,32 @@
         <a-gltf-model rotation="0 0 0" position="0 -0.8 .75" scale="5 5 5" src="#hotcoco" class="santahat-entity" visible="false"></a-gltf-model>
       </a-entity>
     </a-scene>
+    <script>
+      // Main.js content here for mobile orientation handling
+      if (AFRAME.utils.device.isMobile()) {
+        document.querySelector('a-scene').addEventListener('loaded', () => {
+          document.querySelector('a-scene').renderer.xr.getSession().addEventListener('inputsourceschange', (event) => {
+            event.session.inputSources.forEach((inputSource) => {
+              if (inputSource.targetRayMode === 'screen') {
+                const orientation = screen.orientation || {};
+                const lockOrientation = () => {
+                  orientation.lock('portrait');
+                };
+                if (orientation.lock) {
+                  lockOrientation();
+                } else if (orientation.mozLockOrientation) {
+                  orientation.mozLockOrientation('portrait');
+                } else if (orientation.msLockOrientation) {
+                  orientation.msLockOrientation('portrait');
+                } else if (orientation.webkitLockOrientation) {
+                  orientation.webkitLockOrientation('portrait');
+                }
+              }
+            });
+          });
+        });
+      }
+    </script>
   </div>
 </body>
 </html>
