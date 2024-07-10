@@ -39,13 +39,11 @@
 
         function createSnowflake() {
           const sceneEl = document.querySelector('a-scene');
-          console.log('Creating snowflake');
           const snowflake = document.createElement('a-plane');
           const texture = textures[Math.floor(Math.random() * textures.length)];
           snowflake.setAttribute('src', texture);
           const position = `${(Math.random() - 0.5) * 10} ${Math.random() * 5 + 5} ${(Math.random() - 0.5) * 10}`;
           snowflake.setAttribute('position', position);
-          console.log('Snowflake position:', position);
           snowflake.setAttribute('scale', '0.1 0.1 0.1');
           snowflake.setAttribute('rotation', '0 0 0');
           snowflake.setAttribute('material', 'transparent: true; opacity: 0.8;');
