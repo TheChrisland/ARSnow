@@ -28,60 +28,39 @@
           });
         });
 
-        // Snowfall component
-        AFRAME.registerComponent('snowfall', {
-          init: function () {
-            const snowflakeTextures = [
-              '#snowflake1',
-              '#snowflake2',
-              '#snowflake3',
-              '#snowflake4',
-              '#snowflake5'
-            ];
-            const snowflakesContainer = this.el;
-            const snowflakeCount = 10;  // Number of snowflakes created at each interval
+        // Snowflake generation
+        const textures = [
+          'images/snowflake.png',
+          'images/snowflake2.png',
+          'images/snowflake3.png',
+          'images/snowflake4.png',
+          'images/snowflake5.png'
+        ];
 
-            function createSnowflake() {
-              const snowflake = document.createElement('a-plane');
-              const texture = snowflakeTextures[Math.floor(Math.random() * snowflakeTextures.length)];
-              snowflake.setAttribute('src', texture);
-              snowflake.setAttribute('width', '0.05');  // Half the original width
-              snowflake.setAttribute('height', '0.05');  // Half the original height
-              const x = Math.random() * 4 - 2;  // Spread snowflakes across the screen width
-              const y = Math.random() * 3 + 1;  // Start above the screen
-              const z = Math.random() * 4 - 2;  // Spread snowflakes across the screen depth
-              snowflake.setAttribute('position', `${x} ${y} ${z}`);
-              snowflake.setAttribute('rotation', `${Math.random() * 360} ${Math.random() * 360} ${Math.random() * 360}`);
-              snowflake.setAttribute('material', 'transparent: true; opacity: 0.8');
-              
-              // Falling animation
-              const duration = (Math.random() * 2000 + 3000) * 2;  // Double the duration to fall slower
-              snowflake.setAttribute('animation', `property: position; to: ${x} -2 ${z}; dur: ${duration}; easing: linear; loop: false`);
-              
-              snowflakesContainer.appendChild(snowflake);
+        function createSnowflake() {
+          const sceneEl = document.querySelector('a-scene');
+          console.log('Creating snowflake');
+          const snowflake = document.createElement('a-plane');
+          const texture = textures[Math.floor(Math.random() * textures.length)];
+          snowflake.setAttribute('src', texture);
+          const position = `${(Math.random() - 0.5) * 10} ${Math.random() * 5 + 5} ${(Math.random() - 0.5) * 10}`;
+          snowflake.setAttribute('position', position);
+          console.log('Snowflake position:', position);
+          snowflake.setAttribute('scale', '0.1 0.1 0.1');
+          snowflake.setAttribute('rotation', '0 0 0');
+          snowflake.setAttribute('material', 'transparent: true; opacity: 0.8;');
+          sceneEl.appendChild(snowflake);
 
-              // Remove the snowflake after it has fallen
-              setTimeout(() => {
-                snowflakesContainer.removeChild(snowflake);
-              }, duration);
-            }
+          const animation = document.createElement('a-animation');
+          animation.setAttribute('attribute', 'position');
+          animation.setAttribute('to', `${snowflake.getAttribute('position').x} -2 ${snowflake.getAttribute('position').z}`);
+          animation.setAttribute('dur', '10000');
+          animation.setAttribute('easing', 'linear');
+          animation.setAttribute('repeat', 'indefinite');
+          snowflake.appendChild(animation);
+        }
 
-            for (let i = 0; i < 50; i++) {
-              createSnowflake();
-            }
-
-            // Create new snowflakes at a regular interval
-            setInterval(() => {
-              for (let i = 0; i < snowflakeCount; i++) {
-                createSnowflake();
-              }
-            }, 500);  // Adjust the interval as needed
-
-            console.log('Scene loaded, starting continuous snowfall');
-          }
-        });
-
-        document.querySelector('a-scene').setAttribute('snowfall', '');
+        setInterval(createSnowflake, 200); // Adjust interval for more/less snowflakes
       });
     </script>
     <style>
@@ -127,11 +106,6 @@
         <a-asset-item id="glassesModel2" src="models/pixel_glasses.glb"></a-asset-item>
         <a-asset-item id="hatModel" src="models/christmas_hat.glb"></a-asset-item>
         <a-asset-item id="hotcoco" src="models/hot_chocolate.glb"></a-asset-item>
-        <img id="snowflake1" src="images/snowflake.png"/>
-        <img id="snowflake2" src="images/snowflake2.png"/>
-        <img id="snowflake3" src="images/snowflake3.png"/>
-        <img id="snowflake4" src="images/snowflake4.png"/>
-        <img id="snowflake5" src="images/snowflake5.png"/>
       </a-assets>
       <a-camera active="false" position="0 0 0"></a-camera>
       <!-- head occluder -->
