@@ -1,33 +1,85 @@
-
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
-	const list = ["glasses1", "glasses2", "hat1", "hat2", "earring"];
-	const visibles = [false, false, true, false, false];
-	const setVisible = (button, entities, visible) => {
-	  if (visible) {
-	    button.classList.add("selected");
-	  } else {
-	    button.classList.remove("selected");
-	  }
-	  entities.forEach((entity) => {
-	    entity.setAttribute("visible", visible);
-	  });
-	}
-	list.forEach((item, index) => {
-	  const button = document.querySelector("#" + item);
-	  const entities = document.querySelectorAll("." + item + "-entity");
-	  setVisible(button, entities, visibles[index]);
-	  button.addEventListener('click', () => {
-	    visibles[index] = !visibles[index];
-	    setVisible(button, entities, visibles[index]);
-	  });
-	});
-      })
+        const list = ["glasses1", "glasses2", "hat1", "santahat"];
+        const visibles = [true, false, false, false];
+        const setVisible = (button, entities, visible) => {
+          if (visible) {
+            button.classList.add("selected");
+          } else {
+            button.classList.remove("selected");
+          }
+          entities.forEach((entity) => {
+            entity.setAttribute("visible", visible);
+          });
+        }
+        list.forEach((item, index) => {
+          const button = document.querySelector("#" + item);
+          const entities = document.querySelectorAll("." + item + "-entity");
+          setVisible(button, entities, visibles[index]);
+          button.addEventListener('click', () => {
+            visibles[index] = !visibles[index];
+            setVisible(button, entities, visibles[index]);
+          });
+        });
+    
+        // Snowflake generation
+        const textures = [
+          'images/snowflake.png',
+          'images/snowflake2.png',
+          'images/snowflake3.png',
+          'images/snowflake4.png',
+          'images/snowflake5.png'
+        ];
+    
+        function createSnowflake() {
+          const sceneEl = document.querySelector('a-scene');
+          const snowflake = document.createElement('a-entity');
+          const texture = textures[Math.floor(Math.random() * textures.length)];
+          snowflake.setAttribute('geometry', 'primitive: plane; width: 0.1; height: 0.1');
+          snowflake.setAttribute('material', `src: ${texture}; transparent: true; opacity: 0.8; side: double`);
+          const x = (Math.random() - 0.5) * 10;
+          const y = Math.random() * 5 + 5;
+          const z = (Math.random() - 0.5) * 10;
+          snowflake.setAttribute('position', `${x} ${y} ${z}`);
+          snowflake.setAttribute('rotation', '0 0 0');
+          sceneEl.appendChild(snowflake);
+    
+          snowflake.setAttribute('animation', {
+            property: 'position',
+            to: `${x} -2 ${z}`,
+            dur: 10000,
+            easing: 'linear',
+            loop: true
+          });
+    
+          // Remove snowflake when it's below the camera
+          setTimeout(() => {
+            sceneEl.removeChild(snowflake);
+          }, 10000);
+        }
+    
+        function startSnowfall() {
+          console.log("Starting snowfall");
+          setInterval(createSnowflake, 200); // Create a new snowflake every 200ms
+          console.log("Scene element:", document.querySelector('a-scene'));
+          console.log("Snowflake textures:", textures);
+        }
+    
+        // Start snowfall when the scene is loaded
+        const sceneEl = document.querySelector('a-scene');
+        if (sceneEl.hasLoaded) {
+          startSnowfall();
+        } else {
+          sceneEl.addEventListener('loaded', startSnowfall);
+        }
+      });
     </script>
     <style>
       body {
@@ -40,65 +92,89 @@
         height: 100%;
       }
       .options-panel {
-	position: fixed;
-	left: 0;
-	top: 0;
-	z-index: 2;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 2;
       }
       .options-panel img {
-	border: solid 2px;
-	width: 50px;
-	height: 50px;
-	object-fit: cover;
-	cursor: pointer;
+        border: solid 2px;
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        cursor: pointer;
       }
       .options-panel img.selected {
-	border-color: green;
+        border-color: green;
       }
     </style>
-  </head>
-  <body>
-    <div class="example-container">
-      <div class="options-panel">
-	<img id="hat1" src="thumbnails/SantaHat.png"/>
-	<img id="hat2" src="thumbnails/HotCoco.png"/>
-	<img id="glasses1" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/glasses/thumbnail.png"/>
-	<img id="glasses2" src="thumbnails/Glasses.png"/>
-	<img id="earring" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/earring/thumbnail.png"/>
-      </div>
-      <a-scene mindar-face embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
-        <a-assets>
-          <a-asset-item id="headModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/sparkar/headOccluder.glb"></a-asset-item>
-          <a-asset-item id="glassesModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/glasses/scene.gltf"></a-asset-item>
-          <a-asset-item id="glassesModel2" src="models/snowman.obj"></a-asset-item>
-          <a-asset-item id="hatModel" src="models/christmas_hat.glb"></a-asset-item>
-          <a-asset-item id="hatModel2" src="models/hot_chocolate.glb"></a-asset-item>
-          <a-asset-item id="earringModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/earring/scene.gltf"></a-asset-item>
-        </a-assets>
-        <a-camera active="false" position="0 0 0"></a-camera>
-	<!-- head occluder -->
-        <a-entity mindar-face-target="anchorIndex: 168">
-	  <a-gltf-model mindar-face-occluder position="0 -0.3 0.15"rotation="0 0 0" scale="0.065 0.065 0.065" src="#headModel"></a-gltf-model>
-        </a-entity>
-        <a-entity mindar-face-target="anchorIndex: 10">
-	  <a-gltf-model rotation="15 65 0" position="-1.5 -6.7 -1.5" scale="8.35 6.4 5.5" src="#hatModel" class="hat1-entity" visible="false"></a-gltf-model>
-        </a-entity>
-        <a-entity mindar-face-target="anchorIndex: 152">
-	  <a-gltf-model rotation="0 0 0" position="0 -0.8 .75" scale="5 5 5" src="#hatModel2" class="hat2-entity" visible="false"></a-gltf-model>
-        </a-entity>
-        <a-entity mindar-face-target="anchorIndex: 168">
-	  <a-gltf-model rotation="0 -0 0" position="0 0 0" scale="0.01 0.01 0.01" src="#glassesModel" class="glasses1-entity" visible="false"></a-gltf-model>
-        </a-entity>
-        <a-entity mindar-face-target="anchorIndex: 168">
-	  <a-obj-model rotation="-90 0 0" position="-0.53 -0.65 .94" scale="0.08 0.075 0.075" src="#glassesModel2" class="glasses2-entity" visible="false"></a-obj-model>
-        </a-entity>
-        <a-entity mindar-face-target="anchorIndex: 127">
-	  <a-gltf-model rotation="-0.1 -0 0" position="0 -0.3 -0.3" scale="0.05 0.05 0.05" src="#earringModel" class="earring-entity" visible="false"></a-gltf-model>
-        </a-entity>
-        <a-entity mindar-face-target="anchorIndex: 356">
-	  <a-gltf-model rotation="0.1 -0 0" position="0 -0.3 -0.3" scale="0.05 0.05 0.05" src="#earringModel" class="earring-entity" visible="false"></a-gltf-model>
-        </a-entity>
-      </a-scene>
+</head>
+<body>
+  <div class="example-container">
+    <div class="options-panel">
+      <img id="hat1" src="thumbnails/SantaHat.png"/>
+      <img id="glasses1" src="thumbnails/Glasses.png"/>
+      <img id="glasses2" src="thumbnails/PixelGlasses.png"/>
+      <img id="santahat" src="thumbnails/HotCoco.png"/>
     </div>
-  </body>
+    <a-scene mindar-face embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      <a-assets>
+        <a-asset-item id="headModel" src="models/headOccluder.glb"></a-asset-item>
+        <a-asset-item id="glassesModel" src="models/snowman.obj"></a-asset-item>
+        <a-asset-item id="glassesModel2" src="models/pixel_glasses.glb"></a-asset-item>
+        <a-asset-item id="hatModel" src="models/christmas_hat.glb"></a-asset-item>
+        <a-asset-item id="hotcoco" src="models/hot_chocolate.glb"></a-asset-item>
+      </a-assets>
+      <a-camera active="false" position="0 0 0"></a-camera>
+      <!-- head occluder -->
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-gltf-model mindar-face-occluder position="0 -0.3 0.15" rotation="0 0 0" scale="0.065 0.065 0.065" src="#headModel"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 10">
+        <a-gltf-model rotation="15 65 0" position="-1.5 -6.7 -1.5" scale="8.35 6.4 5.5" src="#hatModel" class="hat1-entity" visible="false"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-obj-model rotation="-90 0 0" position="-0.53 -0.65 .95" scale="0.08 0.075 0.075" src="#glassesModel" class="glasses1-entity" visible="false"></a-obj-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-gltf-model rotation="0 45 0" position="-19.87 -.3 29.35" scale="0.95 0.95 0.95" src="#glassesModel2" class="glasses2-entity" visible="false"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 152">
+        <a-gltf-model rotation="0 0 0" position="0 -0.8 .75" scale="5 5 5" src="#hotcoco" class="santahat-entity" visible="false"></a-gltf-model>
+      </a-entity>
+      <a-entity id="snowflakes-container"></a-entity>
+    </a-scene>
+    <script>
+      // Main.js content here for mobile orientation handling
+      if (AFRAME.utils.device.isMobile()) {
+        document.querySelector('a-scene').addEventListener('loaded', () => {
+          document.querySelector('a-scene').renderer.xr.getSession().addEventListener('inputsourceschange', (event) => {
+            event.session.inputSources.forEach((inputSource) => {
+              if (inputSource.targetRayMode === 'screen') {
+                const orientation = screen.orientation || {};
+                const lockOrientation = () => {
+                  orientation.lock('portrait');
+                };
+                if (orientation.lock) {
+                  lockOrientation();
+                } else if (orientation.mozLockOrientation) {
+                  orientation.mozLockOrientation('portrait');
+                } else if (orientation.msLockOrientation) {
+                  orientation.msLockOrientation('portrait');
+                } else if (orientation.webkitLockOrientation) {
+                  orientation.webkitLockOrientation('portrait');
+                }
+              }
+            });
+          });
+        });
+      }
+
+      // Add this for better cross-device compatibility
+      document.querySelector('a-scene').addEventListener('renderstart', function () {
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      });
+    </script>
+  </div>
+</body>
 </html>
