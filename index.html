@@ -59,6 +59,10 @@
         .options-panel img.selected {
             border-color: #00ff00;
         }
+
+        a-gltf-model, a-obj-model {
+            pointer-events: none; /* Ensure models do not capture pointer events */
+        }
     </style>
 </head>
 <body>
@@ -100,11 +104,9 @@
             <a-obj-model rotation="-90 0 0" position="-0.53 -0.65 .95" scale="0.08 0.075 0.075" src="#glassesModel" class="glasses1-entity" visible="false"></a-obj-model>
         </a-entity>
         <a-entity mindar-face-target="anchorIndex: 168">
-            <a-gltf-model rotation="0 45 0" position="-19.87 -.3 29.35" scale="0.95 0.95 0.95" src="#glassesModel2" class="glasses2-entity" visible="false"></a-gltf-model>
-        </a-entity>
+            <a-gltf-model rotation="0 45 0" position="-19.87 -.3 29.35" scale="0.95 0.95 0.95" src="#glassesModel2" class="glasses2-entity" visible="false"></a-entity>
         <a-entity mindar-face-target="anchorIndex: 152">
-            <a-gltf-model rotation="0 0 0" position="0 -0.8 .75" scale="5 5 5" src="#hotcoco" class="santahat-entity" visible="false"></a-gltf-model>
-        </a-entity>
+            <a-gltf-model rotation="0 0 0" position="0 -0.8 .75" scale="5 5 5" src="#hotcoco" class="santahat-entity" visible="false"></a-entity>
         <a-entity id="snowflakes-container"></a-entity>
     </a-scene>
 
@@ -119,6 +121,7 @@
         function toggleTroubleshooting() {
             const controls = document.getElementById('ui-controls');
             controls.style.display = controls.style.display === 'none' ? 'block' : 'none';
+            console.log('Troubleshooting UI toggled');
         }
 
         function toggleVisibility(entityClass) {
@@ -135,6 +138,8 @@
 
                 // Set as current entity for adjustment
                 currentEntity = !visible ? element : null;
+
+                console.log(`Toggled ${entityClass} visibility to ${!visible}`);
             });
         }
 
@@ -207,8 +212,6 @@
                     setVisible(button, entities, visibles[index]);
                 });
             });
-
-            toggleVisibility('hat1-entity');
 
             // Snowflake generation
             const textures = [
